@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { FormGroup, Label, Input, Form, Row, Button, Col, FormFeedback } from 'reactstrap';
 import Validator from './Validator';
+import getCalendar from './getData';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -29,7 +30,8 @@ class App extends Component {
 
   submit(){
     if(this.isValid()){
-      console.log(this.state)
+      console.log(getCalendar(this.state))
+      getCalendar(this.state)
     }
   }
 
@@ -78,9 +80,9 @@ class App extends Component {
                   type="select" 
                   name="country">
                     <option>select country</option>
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
+                    <option>Poland</option>
+                    <option>Romania</option>
+                    <option>Spain</option>
                 </Input>
                 <FormFeedback >{errors.country}</FormFeedback >
               </FormGroup>
