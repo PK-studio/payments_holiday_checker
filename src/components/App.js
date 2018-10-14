@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { FormGroup, Label, Input, Form, Row, Button, Col, FormFeedback } from 'reactstrap';
-import Validator from './Validator';
-import getCalendar from './getData';
+import validator from './validator';
+import getData from './getData';
+import DisplayInfo from './DisplayInfo'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -10,9 +11,10 @@ class App extends Component {
     super();
     this.state = {
       date: '',
-      gbp: '',
+      gbpAmount: '',
       country: '',
-      errors: {}
+      errors: {},
+      infoToDisplay: {}
     };
     this.onChange = this.onChange.bind(this);
     this.submit = this.submit.bind(this);
@@ -23,20 +25,26 @@ class App extends Component {
   }
 
   isValid(){
-    const {errors, isValid} = Validator(this.state)
+    const {errors, isValid} = validator(this.state)
     this.setState({errors: errors})
     return isValid
   }
 
-  submit(){
+  submit(e){
+    e.preventDefault();
     if(this.isValid()){
-      console.log(getCalendar(this.state))
-      getCalendar(this.state)
+      getData(this.state)
+      .then(info => {
+        this.setState({infoToDisplay: info})
+      })
+      .catch(err => {
+        console.log("Someting wrong with fetching: ", err)
+      })
     }
   }
 
   render() {
-    const {errors} = this.state;
+    const {errors, infoToDisplay} = this.state;
     return (
       <div className="app">
         <Form>
@@ -44,7 +52,7 @@ class App extends Component {
 
             <Col sm={4}>
               <FormGroup>
-                <Label><b>Date</b></Label>
+                <Label><b>Date of transfer</b></Label>
                 <Input
                   invalid = {errors.date !== undefined}
                   onChange={this.onChange}
@@ -60,13 +68,13 @@ class App extends Component {
               <FormGroup>
                 <Label><b>GBP amount</b></Label>
                 <Input
-                  invalid = {errors.gbp !== undefined}
+                  invalid = {errors.gbpAmount !== undefined}
                   onChange={this.onChange} 
                   type="number" 
-                  name="gbp"
-                  value={this.state.gbp}
+                  name="gbpAmount"
+                  value={this.state.gbpAmount}
                   placeholder="British Pounds" />
-                  <FormFeedback>{errors.gbp}</FormFeedback>
+                  <FormFeedback>{errors.gbpAmount}</FormFeedback>
               </FormGroup>
             </Col>
 
@@ -89,7 +97,10 @@ class App extends Component {
             </Col>
           </Row>
         </Form>
+
         <Button onClick={this.submit} color='primary' block>Check provided transaction</Button>
+        
+        <DisplayInfo {...infoToDisplay}/>
       </div>
     );
   }
